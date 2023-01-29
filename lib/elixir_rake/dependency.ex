@@ -2,11 +2,17 @@ defmodule ElixirRake.Dependency do
   @max_traversal_level 128
 
   defexception message: """
-    Max dependency level was exceeded (max allowed #{@max_traversal_level}). \
+    Max dependency depth level was exceeded (max level allowed is #{@max_traversal_level}). \
     Probably, you've got a circular dependency.
     """
 
-  def flatten(deps), do: flatten(deps, deps)
+  def flatten([]), do: []
+  def flatten(deps) do
+    cond do
+      Keyword.keyword?(deps) -> flatten(deps, deps)
+      true -> raise ArgumentError, "dependencies must be a keyword"
+    end
+  end
 
   def flatten(_deps, []), do: []
   def flatten(_deps, [], _traversal_level), do: []
