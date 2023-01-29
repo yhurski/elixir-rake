@@ -1,6 +1,6 @@
 # ElixirRake
 
-**This library provides an ability to implement command-line tasks with dependencies, a close alternative to Ruby's Rake/Thor tools.**
+This library provides an ability to implement command-line tasks with dependencies, a close alternative to Ruby's Rake/Thor tools.
 
 ## Installation
 
