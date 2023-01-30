@@ -12,6 +12,14 @@ defmodule ElixirTest.DependencyTest do
     assert flatten(deps) == result
   end
 
+  test "returns empty kw list if empty kw list is passed in" do
+    assert flatten([]) == []
+  end
+
+  test "raises ArgumentError if argument is not a kw list" do
+    assert_raise ArgumentError, fn -> flatten([{:a, [:aa1, :aa2]}, :b]) end
+  end
+
   test "simple two level deep dependencies" do
     deps = [
       a: [:kk, :kk2],
@@ -28,11 +36,5 @@ defmodule ElixirTest.DependencyTest do
     assert flatten(deps) == result
   end
 
-  test "returns empty kw list if empty kw list is passed in" do
-    assert flatten([]) == []
-  end
 
-  test "raises ArgumentError if argument is not a kw list" do
-    assert_raise ArgumentError, fn -> flatten([{:a, [:aa1, :aa2]}, :b]) end
-  end
 end
