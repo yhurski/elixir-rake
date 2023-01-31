@@ -22,6 +22,6 @@ defmodule ElixirRake.Dependency.Formatter do
   end
   defp expand(_mod, {ext_mode, func, args}) # depends_on([{Mod, :ping, ["google.com"]}])
     when is_atom(ext_mode) and is_atom(func) and is_list(args) do
-    {ext_mode, func, []}
+    {ext_mode, func, args}
   end
 end
