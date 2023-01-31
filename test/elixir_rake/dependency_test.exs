@@ -35,6 +35,4 @@ defmodule ElixirTest.DependencyTest do
 
     assert flatten(deps) == result
   end
-
-
 end

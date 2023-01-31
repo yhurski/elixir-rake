@@ -201,4 +201,52 @@ defmodule ElixirTest.Dependency.FormatterTest do
 
     assert expand_each(deps, task_module) == result
   end
+
+  test "[{ext_module1, :dep1}, :dep1, :dep2, {:dep3, [:arg1]}, {ext_module2, :dep4}] dependency expands to \
+        [{ext_module1, :dep1, []}, {task_module, :dep1, []}, \
+        {task_module, :dep2, []}, {task_module, :dep3, [:arg1]}, {ext_module2, :dep4, []}]" do
+    task_module = TaskMod
+    [ext_module1, ext_module2] = [ExternalMod1, ExternalMod2]
+
+    deps = [
+      {ext_module1, :dep1},
+      :dep1,
+      :dep2,
+      {:dep3, [:arg1]},
+      {ext_module2, :dep4}
+    ]
+
+    result = [
+      {ext_module1, :dep1, []},
+      {task_module, :dep1, []},
+      {task_module, :dep2, []},
+      {task_module, :dep3, [:arg1]},
+      {ext_module2, :dep4, []}
+    ]
+
+    assert expand_each(deps, task_module) == result
+  end
+
+  test "[[{ext_module1, :dep1}], [:dep2], [{:dep3, [:arg1]}], [{ext_module2, :dep4}]] dependency expands to \
+        [{ext_module1, :dep1, []}, {task_module, :dep1, []},\
+        {task_module, :dep2, []}, {task_module, :dep3, [:arg1]}, {ext_module2, :dep4, []}]" do
+    task_module = TaskMod
+    [ext_module1, ext_module2] = [ExternalMod1, ExternalMod2]
+
+    deps = [
+      [{ext_module1, :dep1}],
+      [:dep2],
+      [{:dep3, [:arg1]}],
+      [{ext_module2, :dep4}]
+    ]
+
+    result = [
+      {ext_module1, :dep1, []},
+      {task_module, :dep2, []},
+      {task_module, :dep3, [:arg1]},
+      {ext_module2, :dep4, []}
+    ]
+
+    assert expand_each(deps, task_module) == result
+  end
 end
