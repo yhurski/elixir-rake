@@ -1,2 +1,3 @@
 1. Check for module's function existence (in check_each/check);
-1. Task from other modules can (should?) be dependencies;
+2. Task from other modules can (should?) be dependencies;
+3. Come up with task macros for tasks instead of defs;
