@@ -5,12 +5,6 @@ defmodule ElixirTest.Dependency.FormatterTest do
 
   import ElixirRake.Dependency.Formatter
 
-  # setup_all do
-  #   module = Asdf
-
-  #   :ok
-  # end
-
   test "empty dependency list expands to empty list" do
     assert expand_each([], TaskMod) == []
   end
