@@ -6,36 +6,36 @@ defmodule ElixirRake.Dependency.Resolver do
                Probably, you've got a circular dependency.
                """
 
-  def flatten([]), do: []
+  def resolve([]), do: []
 
-  def flatten(deps) do
-    cond do
-      Keyword.keyword?(deps) -> flatten(deps, deps)
-      true -> raise ArgumentError, "dependencies must be a keyword"
-    end
+  def resolve(deps) when is_list(deps), do: resolve(deps, deps)
+  def resolve(_deps), do: raise ArgumentError, "dependencies must be a list of tuples"
+
+  def resolve(_deps, []), do: []
+  def resolve(_deps, [], _traversal_level), do: []
+
+  def resolve(deps, [{key, value} = head | tail]) when is_tuple(head) do
+    [{key, resolve(deps, value, 1)} | resolve(deps, tail)]
   end
 
-  def flatten(_deps, []), do: []
-  def flatten(_deps, [], _traversal_level), do: []
-
-  def flatten(deps, [{key, value} = head | tail] = rest) when is_tuple(head) do
-    [{key, flatten(deps, value, 1)} | flatten(deps, tail)]
+  def resolve(deps, [{key, value} = head | tail], traversal_level) when is_tuple(head) do
+    [{key, resolve(deps, value, traversal_level)} | resolve(deps, tail, traversal_level)]
   end
 
-  def flatten(_deps, _list, traversal_level) when traversal_level >= @max_traversal_level do
+  def resolve(_deps, _list, traversal_level) when traversal_level >= @max_traversal_level do
     raise __MODULE__
   end
 
-  def flatten(deps, [h | rest] = list, traversal_level) when is_atom(h) do
+  def resolve(deps, [{mod, func, args} = h | rest] = list, traversal_level) when is_tuple(h) do
     IO.puts("zzz, #{inspect(list)}, #{traversal_level}")
 
-    if Keyword.has_key?(deps, h) do
-      [
-        {h, flatten(deps, Keyword.get(deps, h), traversal_level + 1)}
-        | flatten(deps, rest, traversal_level)
-      ]
-    else
-      [h | flatten(deps, rest, traversal_level)]
+    case List.keyfind(deps, {mod, func, length(args)}, 0) do
+      {_action, deps_list} when length(deps_list) > 0 ->
+        [
+          {h, resolve(deps, deps_list, traversal_level + 1)}
+          | resolve(deps, rest, traversal_level)
+        ]
+      _ -> [h | resolve(deps, rest, traversal_level)]
     end
   end
 end

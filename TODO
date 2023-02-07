@@ -1,3 +1,5 @@
 1. Check for module's function existence (in check_each/check);
 2. Task from other modules can (should?) be dependencies;
 3. Come up with task macros for tasks instead of defs;
+4. Dependency resolution works only for the current task module;
+5. Add moduledocs;
