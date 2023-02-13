@@ -3,3 +3,4 @@
 3. Come up with task macros for tasks instead of defs;
 4. Dependency resolution works only for the current task module;
 5. Add moduledocs;
+6. shortdesc macro for rake tasklist;
