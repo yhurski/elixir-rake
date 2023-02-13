@@ -15,18 +15,18 @@ defmodule ElixirTest.Dependency.ResolverTest do
     end
 
     test "returns empty dependencies for actions with empty dependencies" do
-      deps = [{{:mod1, :a, 0}, []}, {{:mod2, :b, 1}, []}, {{:mod3, :c, 3}, []}]
-      result = [{{:mod1, :a, 0}, []}, {{:mod2, :b, 1}, []}, {{:mod3, :c, 3}, []}]
+      deps = [{{:mod1, :a, 0}, "task desc", []}, {{:mod2, :b, 1}, "task desc1", []}, {{:mod3, :c, 3}, "task desc2", []}]
+      result = [{{:mod1, :a, 0}, "task desc", []}, {{:mod2, :b, 1}, "task desc1", []}, {{:mod3, :c, 3}, "task desc2", []}]
 
       assert resolve(deps) == result
     end
 
     test "returns dependencies for one level dependencies #1" do
       deps = [
-        {{:mod1, :a, 0}, [{:mod2, :b, [1,2]}, {:mod3, :c, [1,2]}]}
+        {{:mod1, :a, 0}, "task desc", [{:mod2, :b, [1,2]}, {:mod3, :c, [1,2]}]}
       ]
       result = [
-        {{:mod1, :a, 0}, [{:mod2, :b, [1,2]}, {:mod3, :c, [1,2]}]}
+        {{:mod1, :a, 0}, "task desc", [{:mod2, :b, [1,2]}, {:mod3, :c, [1,2]}]}
       ]
 
       assert resolve(deps) == result
@@ -34,19 +34,26 @@ defmodule ElixirTest.Dependency.ResolverTest do
 
     test "returns dependencies for one level dependencies #2" do
       deps = [
-        {{:mod1, :a, 2}, [{:mod2, :kk, [1, 2]}, {:mod2, :kk2, ["a", "b"]}]},
-        {{:mod1, :top, 0}, [{:mod1, :a, ["h", "w"]}, {:mod1, :b, []}]},
-        {{:mod1, :top2, 4}, [{:mod1, :top, []}, {:mod1, :b, []}]}
+        {{:mod1, :a, 2}, "task desc1", [{:mod2, :kk, [1, 2]}, {:mod2, :kk2, ["a", "b"]}]},
+        {{:mod1, :top, 0}, "task desc2", [{:mod1, :a, ["h", "w"]}, {:mod1, :b, []}]},
+        {{:mod1, :top2, 4}, "task desc3", [{:mod1, :top, []}, {:mod1, :b, []}]}
       ]
 
       result = [
-        {{:mod1, :a, 2}, [{:mod2, :kk, [1, 2]}, {:mod2, :kk2, ["a", "b"]}]},
+        {{:mod1, :a, 2},
+         "task desc1",
+         [
+           {:mod2, :kk, [1, 2]},
+           {:mod2, :kk2, ["a", "b"]}
+         ]},
         {{:mod1, :top, 0},
+         "task desc2",
          [
            {{:mod1, :a, ["h", "w"]}, [{:mod2, :kk, [1, 2]}, {:mod2, :kk2, ["a", "b"]}]},
            {:mod1, :b, []}
          ]},
         {{:mod1, :top2, 4},
+         "task desc3",
          [
            {{:mod1, :top, []},
             [
@@ -62,10 +69,10 @@ defmodule ElixirTest.Dependency.ResolverTest do
 
     test "returns dependencies for one level dependencies with empty dependencies list for second level" do
       deps = [
-        {{:mod1, :a, 0}, [{{:mod2, :b, [1,2]}, []}, {{:mod3, :c, [1,2]}, []}]}
+        {{:mod1, :a, 0}, "task desc", [{{:mod2, :b, [1,2]}, []}, {{:mod3, :c, [1,2]}, []}]}
       ]
       result = [
-        {{:mod1, :a, 0}, [{{:mod2, :b, [1,2]}, []}, {{:mod3, :c, [1,2]}, []}]}
+        {{:mod1, :a, 0}, "task desc", [{{:mod2, :b, [1,2]}, []}, {{:mod3, :c, [1,2]}, []}]}
       ]
 
       assert resolve(deps) == result
@@ -73,10 +80,10 @@ defmodule ElixirTest.Dependency.ResolverTest do
 
     test "returns dependencies for two level dependencies" do
       deps = [
-        {{:mod1, :a, 0}, [{{:mod2, :b, [1,2]}, [{:mod3, :c, [1,2]}]} ]}
+        {{:mod1, :a, 0}, "task desc", [{{:mod2, :b, [1,2]}, [{:mod3, :c, [1,2]}]} ]}
       ]
       result = [
-        {{:mod1, :a, 0}, [{{:mod2, :b, [1,2]}, [{:mod3, :c, [1,2]}]} ]}
+        {{:mod1, :a, 0}, "task desc", [{{:mod2, :b, [1,2]}, [{:mod3, :c, [1,2]}]} ]}
       ]
 
       assert resolve(deps) == result
@@ -84,8 +91,8 @@ defmodule ElixirTest.Dependency.ResolverTest do
 
     test "raises ElixirRake.Dependency.Resolver exception for a circular dependency" do
       deps = [
-        {{:mod1, :a, 0}, [{:mod2, :b, []}]},
-        {{:mod2, :b, 0}, [{:mod1, :a, []}]}
+        {{:mod1, :a, 0}, "task desc", [{:mod2, :b, []}]},
+        {{:mod2, :b, 0}, "task desc", [{:mod1, :a, []}]}
       ]
 
       assert_raise ElixirRake.Dependency.Resolver, fn -> resolve(deps) end

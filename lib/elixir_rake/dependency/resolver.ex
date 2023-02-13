@@ -14,8 +14,8 @@ defmodule ElixirRake.Dependency.Resolver do
   def resolve(_deps, []), do: []
   def resolve(_deps, [], _traversal_level), do: []
 
-  def resolve(deps, [{key, value} = head | tail]) when is_tuple(head) do
-    [{key, resolve(deps, value, 1)} | resolve(deps, tail)]
+  def resolve(deps, [{key, desc, value} = head | tail]) when is_tuple(head) do
+    [{key, desc, resolve(deps, value, 1)} | resolve(deps, tail)]
   end
 
   def resolve(deps, [{key, value} = head | tail], traversal_level) when is_tuple(head) do
@@ -30,7 +30,7 @@ defmodule ElixirRake.Dependency.Resolver do
     IO.puts("zzz, #{inspect(list)}, #{traversal_level}")
 
     case List.keyfind(deps, {mod, func, length(args)}, 0) do
-      {_action, deps_list} when length(deps_list) > 0 ->
+      {_action, _desc, deps_list} when deps_list != [] ->
         [
           {h, resolve(deps, deps_list, traversal_level + 1)}
           | resolve(deps, rest, traversal_level)
